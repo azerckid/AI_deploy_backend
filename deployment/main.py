@@ -20,7 +20,7 @@ app = FastAPI()
 
 allowed_origins_raw = os.environ.get(
     "ALLOWED_ORIGINS",
-    "http://localhost:5173,https://deployment-backend-production-2db3.up.railway.app",
+    "http://localhost:5173,https://deployment-backend-production-2db3.up.railway.app,https://ai-deploy-frontend.vercel.app",
 )
 
 _allowed_origin_tokens = allowed_origins_raw.replace(";", ",").split(",")
