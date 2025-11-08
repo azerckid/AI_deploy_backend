@@ -22,7 +22,9 @@ Conversations API.
 
    ```env
    OPENAI_API_KEY=sk-...
-   # Optional: OPENAI_PROJECT=proj_...
+   # Optional: OPENAI_PROJECT=proj-...
+   # Optional: comma/semicolon-separated origins allowed to call FastAPI
+   ALLOWED_ORIGINS=http://localhost:5173,https://your-frontend.vercel.app
    ```
 
    The `.env` file is ignored by Git. Rotate leaked keys immediately.
@@ -59,4 +61,6 @@ server, press `Ctrl+C` or run `pkill -f "uvicorn deployment.main:app"`.
   virtual environment, deactivate it and retry.
 - After changing environment variables, restart the server so the new values
   are loaded.
+- 기본적으로 FastAPI는 `http://localhost:5173`에서 오는 브라우저 요청을 허용합니다.
+  Vercel 등 다른 도메인을 추가하려면 `ALLOWED_ORIGINS`를 설정하세요.
 

@@ -1,5 +1,8 @@
+import os
+
 from dotenv import load_dotenv
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from openai import AsyncOpenAI
 from pydantic import BaseModel
@@ -15,6 +18,22 @@ agent = Agent(
 
 app = FastAPI()
 
+allowed_origins_raw = os.environ.get(
+    "ALLOWED_ORIGINS",
+    "http://localhost:5173,https://deployment-backend-production-2db3.up.railway.app",
+)
+
+_allowed_origin_tokens = allowed_origins_raw.replace(";", ",").split(",")
+allowed_origins = [origin.strip() for origin in _allowed_origin_tokens if origin.strip()]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=allowed_origins or ["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 client = AsyncOpenAI()
 
 
@@ -22,12 +41,16 @@ class CreateConversationResponse(BaseModel):
     conversation_id: str
 
 
+@app.get("/")
+def hello_world():
+    return {
+        "message": "hello world",
+    }
+
 @app.post("/conversations")
 async def create_conversation() -> CreateConversationResponse:
     conversation = await client.conversations.create()
-    return {
-        "conversation_id": conversation.id,
-    }
+    return CreateConversationResponse(conversation_id=conversation.id)
 
 
 class CreateMessageInput(BaseModel):
@@ -47,15 +70,13 @@ async def create_message(
         input=message_input.question,
         conversation_id=conversation_id,
     )
-    return {
-        "answer": answer.final_output,
-    }
+    return CreateMessageOutput(answer=answer.final_output)
 
 
 @app.post("/conversations/{conversation_id}/message-stream")
 async def create_message_stream(
     conversation_id: str, message_input: CreateMessageInput
-) -> CreateMessageOutput:
+) -> StreamingResponse:
     async def event_generator():
         events = Runner.run_streamed(
             starting_agent=agent,
@@ -75,7 +96,7 @@ async def create_message_stream(
 @app.post("/conversations/{conversation_id}/message-stream-all")
 async def create_message_stream_all(
     conversation_id: str, message_input: CreateMessageInput
-) -> CreateMessageOutput:
+) -> StreamingResponse:
     async def event_generator():
         events = Runner.run_streamed(
             starting_agent=agent,

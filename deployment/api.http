@@ -1,29 +1,33 @@
-POST http://127.0.0.1:8000/conversations
-
+POST https://my-agent-deployment-production.up.railway.app/conversations
+curl -X POST https://deployment-backend-production-2db3.up.railway.app/conversations
 ###
 
-POST http://127.0.0.1:8000/conversations/{conversation_id}/message
+POST https://my-agent-deployment-production.up.railway.app/conversations/conv_68ecee93c9dc8196bec1d4498c865b960878abcbda12053b/message
 Content-Type: application/json
 
 {
-    "question": "What is the first question I asked you?"
+    "question": "How big is Spain vs. Korea"
 }
 
 ###
 
-POST http://127.0.0.1:8000/conversations/{conversation_id}/message-stream
+POST https://my-agent-deployment-production.up.railway.app/conversations/conv_68ecee93c9dc8196bec1d4498c865b960878abcbda12053b/message-stream
 Content-Type: application/json
 
 {
     "question": "What is the size of the Great Wall of China?"
 }
 
-curl -N -X POST http://127.0.0.1:8000/conversations/{conversation_id}/message-stream \
+curl -N -X POST https://my-agent-deployment-production.up.railway.app/conversations/conv_68ecee93c9dc8196bec1d4498c865b960878abcbda12053b/message-stream \
   -H "Content-Type: application/json" \
   -d '{"question": "What is the size of the Great Wall of China?"}'
 
 ###
 
-curl -N -X POST http://127.0.0.1:8000/conversations/{conversation_id}/message-stream-all \
+curl -N -X POST https://my-agent-deployment-production.up.railway.app/conversations/conv_68ecee93c9dc8196bec1d4498c865b960878abcbda12053b/message-stream-all \
+  -H "Content-Type: application/json" \
+  -d '{"question": "What is the size of the Great Wall of China?"}'
+
+curl -N -X POST https://deployment-backend-production-2db3.up.railway.app/conversations/conv_690e1b07cb708195881e668c9dde755c05f543fcc2532e37/message-stream-all \
   -H "Content-Type: application/json" \
   -d '{"question": "What is the size of the Great Wall of China?"}'
